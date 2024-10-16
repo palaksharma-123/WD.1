@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            width: 50%;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"], input[type="date"] {
+            width: 100%;
+            height: 40px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Registration Form</h1>
+    <form id="registration-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required><br><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br><br>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" required><br><br>
+        <label for="accepted-terms">Accepted Terms:</label>
+        <input type="checkbox" id="accepted-terms" required><br><br>
+        <button type="submit">Submit</button>
+    </form>
+    <table id="registration-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Dob</th>
+                <th>Accepted Terms?</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+    </table>
+
+    <script>
+        // Load saved data from web storage
+        window.onload = function() {
+            const storedData = localStorage.getItem('registrations');
+            if (storedData) {
+                const registrations = JSON.parse(storedData);
+                registrations.forEach(registration => {
+                    addRegistrationToTable(registration);
+                });
+            }
+        };
+
+        // Add event listener to form submission
+        document.getElementById('registration-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const dob = document.getElementById('dob').value;
+            const acceptedTerms = document.getElementById('accepted-terms').checked;
+
+            // Validate date of birth
+            const dobDate = new Date(dob);
+            const today = new Date();
+            const age = today.getFullYear() - dobDate.getFullYear();
+            if (age < 18 || age > 55) {
+                alert('Please enter a date of birth between 18 and 55 years old.');
+                return;
+            }
+
+            // Save data to web storage
+            const registration = {
+                name,
+                email,
+                password,
+                dob,
+                acceptedTerms
+            };
+            const storedData = localStorage.getItem('registrations');
+            let registrations;
+            if (storedData) {
+                registrations = JSON.parse(storedData);
+            } else {
+                registrations = [];
+            }
+            registrations.push(registration);
+            localStorage.setItem('registrations', JSON.stringify(registrations));
+
+            // Add registration to table
+            addRegistrationToTable(registration);
+
+            // Clear form fields
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('dob').value = '';
+            document.getElementById('accepted-terms').checked = false;
+        });
+
+        // Function to add registration to table
+        function addRegistrationToTable(registration) {
+            const tableBody = document.getElementById('table-body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${registration.name}</td>
+                <td>${registration.email}</td>
+                <td>${registration.password}</td>
+                <td>${registration.dob}</td>
+                <td>${registration.acceptedTerms}</td>
+            `;
+            tableBody.appendChild(row);
+        }
+    </script>
+</body>
+</html>
